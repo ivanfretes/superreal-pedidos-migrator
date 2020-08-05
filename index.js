@@ -9,6 +9,96 @@ const body = {
 	local : 101
 }
 
-db.query('SELECT NOW()', (err, res) => {
-  console.log(err, res)
-})
+// Import mock
+const _items = require('./mock');
+
+/**
+ * Consulta los datos 
+ */
+request.post(uri, {
+    headers : {
+        'Content-Type': 'application/json',
+        'Accept' : 'application/json'
+    },
+    body : JSON.stringify(body)
+}, async (error, response) => {
+    try {
+        truncate_tables_db();
+        
+        if (response.statusCode == 400)
+            throw (JSON.parse(response.body));
+        
+        const _res = JSON.parse(response.body);    
+        const pedidos = _res.data;
+
+        for (const pedido of pedidos) {
+            const { items, header } = pedido;
+            //console.log(header);
+            insert_pedidos_en_db(header, items);
+        }
+        
+    } catch (e) {
+        console.log(response.statusCode);
+        console.log(e.message);
+    } finally{
+        console.log('Proceso finalizado')
+    }
+});
+
+/**
+ * Vacia las tablas en cuestion
+ */
+const truncate_tables_db = async () => {
+    try {
+        const tables = ['detalle_pedidos', 'pedidos'];
+        tables.forEach(async table => {
+            await db.query(`TRUNCATE TABLE ${table} CASCADE`);
+        });    
+
+        console.log('Truncado correcto');
+
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+/**
+ * Inserta pedidos en la DB, si se genera algun conflicto hace un rollback
+ */
+const insert_pedidos_en_db = async (pedido, items) => {
+    let {
+            nro_pedido, cajero , fecha_creacion , local_nombre_zona, estado
+        } = pedido;
+    try {
+        // Inserta el pedido
+        cajero = `Cajero ${nro_pedido}`;
+
+        await db.query('BEGIN');
+        const queryText = `
+            INSERT INTO pedidos(num_pedido, supervisor , picker , fecha , sucursal, estado) 
+            VALUES($1, $2, $3, $4, $5, $6 )`;
+        await db.query(queryText, [
+            nro_pedido, cajero , `Encargado ${nro_pedido}` , fecha_creacion , local_nombre_zona, estado
+        ]);
+
+        // Inserta los detalles
+        // Modificar cuando existan items webservice este poblado (_items por items)
+        for (const item of _items) {
+            let queryDetalleText = `
+            INSERT INTO detalle_pedidos(num_pedido, codigo_barra, descripcion, cantidad, categoria, obs) 
+            VALUES ($1, $2, $3, $4, $5, $6) `;
+
+            let { codigo_barra, descripcion , cantidad, categoria, obs } = item;
+            db.query(queryDetalleText, [nro_pedido, `${codigo_barra}`, descripcion, `${cantidad}`, categoria, obs]);
+        }
+        await db.query('COMMIT');
+        
+    } catch (e) {
+        await db.query('ROLLBACK')
+        throw e;
+    } finally{
+        console.log(`Pedido nro ${nro_pedido} migrado...`)
+    }
+};
+
+
