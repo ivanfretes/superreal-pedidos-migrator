@@ -6,12 +6,12 @@
 
 ### Instrucciones
 
-`sh
+```sh
 # para instalar las dependencias del proyecto 
 $ npm install
 # para ejecutar el proyecto
 $ npm start
-`
+```
 
 ### Dependencias
 - [pg](https://node-postgres.com/)
