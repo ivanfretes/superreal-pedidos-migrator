@@ -1,0 +1,24 @@
+CREATE TABLE pedidos 
+(
+    num_pedido character varying(100) PRIMARY KEY,
+    supervisor character varying(100) NOT NULL,
+    picker character varying(100) NOT NULL,
+    fecha character varying(100) NOT NULL,
+    sucursal character varying(100) NOT NULL,
+    estado character varying(100) NOT NULL   
+);
+
+CREATE TABLE detalle_pedidos 
+(
+	num_pedido character varying(100) NOT NULL,
+	codigo_barra character varying(100) NOT NULL,
+	descripcion character varying(100) NOT NULL,	
+	cantidad double precision NOT NULL,
+	categoria character varying(100) NOT NULL,
+	obs character varying(100) NOT NULL		
+); 
+
+ALTER TABLE detalle_pedidos
+   ADD CONSTRAINT fk_num_pedido
+   FOREIGN KEY (num_pedido) 
+   REFERENCES pedidos(num_pedido);

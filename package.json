@@ -1,0 +1,23 @@
+{
+  "name": "superreal-pedidos-migrator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start" : "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ivanfretes/superreal-pedidos-migrator.git"
+  },
+  "author": "Ivan Fretes",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ivanfretes/superreal-pedidos-migrator/issues"
+  },
+  "homepage": "https://github.com/ivanfretes/superreal-pedidos-migrator#readme",
+  "dependencies": {
+    "pg": "^8.3.0"
+  }
+}
