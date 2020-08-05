@@ -11,5 +11,4 @@ const body = {
 
 db.query('SELECT NOW()', (err, res) => {
   console.log(err, res)
-  pool.end()
 })
