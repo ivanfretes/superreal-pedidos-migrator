@@ -79,7 +79,7 @@ const insert_pedidos_en_db = async (pedido) => {
             INSERT INTO pedidos(num_pedido, supervisor , picker , fecha , sucursal, estado) 
             VALUES($1, $2, $3, $4, $5, $6 )`;
         await db.query(queryText, [
-            nro_pedido, cajero , `Encargado ${nro_pedido}` , fecha_creacion , local_nombre_zona, estado
+            nro_pedido, `Supervisor ${nro_pedido}` , cajero,  fecha_creacion , local_nombre_zona, estado
         ]);
 
         // Inserta los detalles
