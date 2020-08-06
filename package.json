@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/ivanfretes/superreal-pedidos-migrator#readme",
   "dependencies": {
-    "pg": "^8.3.0"
+    "pg": "^8.3.0",
+    "request" : "^2.88.2"
   }
 }
