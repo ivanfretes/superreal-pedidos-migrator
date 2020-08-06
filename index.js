@@ -31,10 +31,10 @@ request.post(uri, {
         const _res = JSON.parse(response.body);    
         const pedidos = _res.data;
 
+        // Se insertan los pedidos
         for (const pedido of pedidos) {
             const { items, header } = pedido;
-            //console.log(header);
-            insert_pedidos_en_db(header, items);
+            insert_pedidos_en_db(header);
         }
         
     } catch (e) {
@@ -65,7 +65,8 @@ const truncate_tables_db = async () => {
 /**
  * Inserta pedidos en la DB, si se genera algun conflicto hace un rollback
  */
-const insert_pedidos_en_db = async (pedido, items) => {
+
+const insert_pedidos_en_db = async (pedido) => {
     let {
             nro_pedido, cajero , fecha_creacion , local_nombre_zona, estado
         } = pedido;
@@ -82,15 +83,7 @@ const insert_pedidos_en_db = async (pedido, items) => {
         ]);
 
         // Inserta los detalles
-        // Modificar cuando existan items webservice este poblado (_items por items)
-        for (const item of _items) {
-            let queryDetalleText = `
-            INSERT INTO detalle_pedidos(num_pedido, codigo_barra, descripcion, cantidad, categoria, obs) 
-            VALUES ($1, $2, $3, $4, $5, $6) `;
-
-            let { codigo_barra, descripcion , cantidad, categoria, obs } = item;
-            db.query(queryDetalleText, [nro_pedido, `${codigo_barra}`, descripcion, `${cantidad}`, categoria, obs]);
-        }
+        get_list_detalle_pedido(nro_pedido);
         await db.query('COMMIT');
         
     } catch (e) {
@@ -101,4 +94,40 @@ const insert_pedidos_en_db = async (pedido, items) => {
     }
 };
 
+const CATEGORIA = 'CATEGORIA';
+const OBS = '--';
 
+/**
+ * Retornar el listado de detalles por pedido
+ * @param {*} nro_pedido 
+*/
+const get_list_detalle_pedido = async (nro_pedido) => {
+    let uri = 'https://real.geocom.com.uy/index.php/rest/V1/geoapi/index/salesOrder';
+    body['order_id'] = nro_pedido;
+
+    request.post(uri, {
+        headers : {
+            'Content-Type' : 'application/json',
+            'Accept' : 'application/json'
+        },
+        body : JSON.stringify(body)
+    }, async (error, response) => {
+        const _response = JSON.parse(response.body);
+        const { header, items } = _response.data;
+        const { codigo_barras } = header;
+
+        let queryText = `
+                INSERT INTO detalle_pedidos(num_pedido, codigo_barra, descripcion, cantidad, categoria, obs) 
+                VALUES ($1, $2, $3, $4, $5, $6) `;
+
+        for (const item of items) {
+            let { descripcion, cantidad, sku } = item;
+
+            db.query(queryText, [nro_pedido, sku, descripcion, parseFloat(cantidad), CATEGORIA, OBS]);    
+            console.log(`\tDetalle ${sku} migrado`)
+        }
+
+        console.log('==============');
+        return;
+    });   
+}

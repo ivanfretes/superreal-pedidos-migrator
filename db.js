@@ -4,6 +4,7 @@ const client = new Client({
     user: 'postgres',
     password: 'postgres',
     database: 'super_real_pedido',
+    port : '5432'
 });
 client.connect();
 
