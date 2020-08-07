@@ -80,10 +80,12 @@ const insert_pedidos_en_db = async (pedidoHeader, pedidoData) => {
 
         await db.query('BEGIN');
         const queryText = `
-            INSERT INTO pedidos(num_pedido, supervisor , picker , fecha , sucursal, estado) 
-            VALUES($1, $2, $3, $4, $5, $6 )`;
+            INSERT INTO pedidos(num_pedido, supervisor , picker , fecha , sucursal, estado,
+            fecha_entrega, hora_rango_entrega, telefono, nombre_cliente) 
+            VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10 )`;
         await db.query(queryText, [
-            nro_pedido, `Supervisor ${nro_pedido}` , cajero,  fecha_creacion , local_nombre_zona, estado
+            nro_pedido, `Supervisor ${nro_pedido}` , cajero,  fecha_creacion , local_nombre_zona, estado,
+            entrega_programada_fecha, entrega_programada, telefono, nombre
         ]);
 
         // Inserta los detalles
