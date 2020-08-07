@@ -1,13 +1,21 @@
+DROP TABLE pedidos;
 CREATE TABLE pedidos 
 (
     num_pedido character varying(100) PRIMARY KEY,
     supervisor character varying(100) NOT NULL,
-    picker character varying(100) NOT NULL,
+    picker character varying(100) NULL,
     fecha character varying(100) NOT NULL,
     sucursal character varying(100) NOT NULL,
-    estado character varying(100) NOT NULL   
+    estado character varying(100) NOT NULL,   
+    
+    -- Campos que le agrego
+    fecha_entrega timestamp,
+    hora_rango_entrega character varying(100) NOT NULL,
+    telefono character varying(50) NOT NULL,
+    nombre_cliente character varying(100)
 );
 
+DROP TABLE detalle_pedidos;
 CREATE TABLE detalle_pedidos 
 (
 	num_pedido character varying(100) NOT NULL,
