@@ -2,7 +2,7 @@ CREATE TABLE pedidos
 (
     num_pedido character varying(100) PRIMARY KEY,
     supervisor character varying(100) NOT NULL,
-    picker character varying(100) NOT NULL,
+    picker character varying(100) NULL,
     fecha character varying(100) NOT NULL,
     sucursal character varying(100) NOT NULL,
     estado character varying(100) NOT NULL   

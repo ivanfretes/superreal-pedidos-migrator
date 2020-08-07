@@ -33,8 +33,8 @@ request.post(uri, {
 
         // Se insertan los pedidos
         for (const pedido of pedidos) {
-            const { items, header } = pedido;
-            insert_pedidos_en_db(header);
+            const { items, header, dispatchdata } = pedido;
+            insert_pedidos_en_db(header, dispatchdata);
         }
         
     } catch (e) {
@@ -66,10 +66,14 @@ const truncate_tables_db = async () => {
  * Inserta pedidos en la DB, si se genera algun conflicto hace un rollback
  */
 
-const insert_pedidos_en_db = async (pedido) => {
+const insert_pedidos_en_db = async (pedidoHeader, pedidoData) => {
     let {
-            nro_pedido, cajero , fecha_creacion , local_nombre_zona, estado
-        } = pedido;
+        nro_pedido, cajero , fecha_creacion , local_nombre_zona, estado } = pedidoHeader;
+
+    // NOMBRE DEL CLIENTE, TELEFONO, FECHA DE ENTREGA, FRANJA HORARIA DE ENTREGA
+    let { 
+        nombre, telefono, entrega_programada_fecha, entrega_programada } = pedidoData
+
     try {
         // Inserta el pedido
         cajero = `Cajero ${nro_pedido}`;
