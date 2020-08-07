@@ -1,6 +1,7 @@
 const request = require('request');
 const db = require('./db');
 
+// Url con el listado de los pedidos
 const uri = 'https://real.geocom.com.uy/index.php/rest/V1/geoapi/index/remainingDispatchOrdersFilters';
 const body = {
 	username : "geocom",
@@ -9,11 +10,10 @@ const body = {
 	local : 101
 }
 
-// Import mock
-const _items = require('./mock');
 
 /**
- * Consulta los datos 
+ * Consulta los datos, del listado de pedidos, sin los detalles
+ * Luego en base a los pedidos obtenidos, consulta sus detalles
  */
 request.post(uri, {
     headers : {
@@ -31,9 +31,8 @@ request.post(uri, {
         const _res = JSON.parse(response.body);    
         const pedidos = _res.data;
 
-        // Se insertan los pedidos
         for (const pedido of pedidos) {
-            const { items, header, dispatchdata } = pedido;
+            const { header, dispatchdata } = pedido;
             insert_pedidos_en_db(header, dispatchdata);
         }
         
@@ -41,9 +40,11 @@ request.post(uri, {
         console.log(response.statusCode);
         console.log(e.message);
     } finally{
-        console.log('Proceso finalizado')
+        console.log('Proceso finalizado');
+
     }
 });
+
 
 /**
  * Vacia las tablas en cuestion
@@ -62,15 +63,18 @@ const truncate_tables_db = async () => {
     }
 }
 
+
 /**
  * Inserta pedidos en la DB, si se genera algun conflicto hace un rollback
+ * y a su vez inserta los detalles, consumiendo otro endpoint
+ * 
+ * @param pedidoHeader - Cabecera del pedido
+ * @param pedidoData - Información de la entrega y datos del cliente
  */
-
 const insert_pedidos_en_db = async (pedidoHeader, pedidoData) => {
     let {
         nro_pedido, cajero , fecha_creacion , local_nombre_zona, estado } = pedidoHeader;
 
-    // NOMBRE DEL CLIENTE, TELEFONO, FECHA DE ENTREGA, FRANJA HORARIA DE ENTREGA
     let { 
         nombre, telefono, entrega_programada_fecha, entrega_programada } = pedidoData
 
@@ -100,11 +104,12 @@ const insert_pedidos_en_db = async (pedidoHeader, pedidoData) => {
     }
 };
 
+
 const CATEGORIA = 'CATEGORIA';
 const OBS = '--';
 
 /**
- * Retornar el listado de detalles por pedido
+ * Consume el listado de detalles por pedido y genera el query para la inserción
  * @param {*} nro_pedido 
 */
 const get_list_detalle_pedido = async (nro_pedido) => {
