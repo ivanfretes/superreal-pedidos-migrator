@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start" : "node index.js"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -18,7 +18,9 @@
   },
   "homepage": "https://github.com/ivanfretes/superreal-pedidos-migrator#readme",
   "dependencies": {
+    "cron": "^1.8.2",
     "pg": "^8.3.0",
-    "request" : "^2.88.2"
+    "pm2": "^4.4.0",
+    "request": "^2.88.2"
   }
 }

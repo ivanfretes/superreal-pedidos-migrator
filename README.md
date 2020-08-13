@@ -16,6 +16,8 @@ $ npm start
 ### Dependencias
 - [pg](https://node-postgres.com/)
 - [request](https://github.com/request/request)
+- [cron](https://www.npmjs.com/package/cron)
+- [pm2](https://www.npmjs.com/package/pm2)
 
 
 ### Resultados

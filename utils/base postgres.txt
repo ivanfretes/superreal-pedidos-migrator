@@ -26,6 +26,14 @@ CREATE TABLE detalle_pedidos
 	obs character varying(100) NOT NULL		
 ); 
 
+DROP TABLE pedido_actualizacion;
+CREATE TABLE pedido_actualizacion
+(
+    fecha_creacion timestamp PRIMARY KEY,
+    descripcion character varying(100)
+); 
+
+
 ALTER TABLE detalle_pedidos
    ADD CONSTRAINT fk_num_pedido
    FOREIGN KEY (num_pedido) 
